@@ -9,7 +9,7 @@ market (Wednesday and Saturday, one fixed location in Belgium, Knokke-Heist):
 1. **Market tracker** - log each market day (date, revenue, staff count, note) and
    see season trends.
 2. **Invoice request** - capture B2B customer details at the stall and send a clean,
-   structured email to the administration office (bomberna@info.be), who raise the formal invoice.
+   structured email to the administration office (info@bomberna.be), who raise the formal invoice.
 
 ## Architecture (decided)
 A split, not a single app. Do not try to merge these.
