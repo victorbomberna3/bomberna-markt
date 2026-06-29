@@ -353,6 +353,7 @@ function copyInvoice(){
   else{ alert(t); }
 }
 function clearInvoice(){
+  if(!confirm("Alle velden wissen?")) return;
   ["f_company","f_contact","f_vat","f_addr","f_phone","f_email","f_desc","f_amount","f_remark"].forEach(function(id){
     document.getElementById(id).value="";
   });
