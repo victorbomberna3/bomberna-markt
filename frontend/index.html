@@ -243,6 +243,7 @@ function addMarket(){
   if(!date){ alert("Vul een datum in."); return; }
   if(isNaN(rev)){ alert("Vul de omzet in."); return; }
   var a=load();
+  if(a.some(function(x){return x.date===date;})&&!confirm("Er staat al een dag op deze datum. Toch opslaan?")) return;
   a.push({
     id:Date.now(), date:date, rev:rev,
     staff:parseInt(document.getElementById("m_staff").value)||null,
