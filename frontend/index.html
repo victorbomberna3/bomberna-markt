@@ -362,7 +362,8 @@ function saveAdmin(){ set("adminEmail", document.getElementById("adminEmail").va
 
 /* ---------- init ---------- */
 setDateDefault();
-document.getElementById("adminEmail").value=get("adminEmail")||"";
+if(!get("adminEmail")) set("adminEmail","info@bomberna.be");
+document.getElementById("adminEmail").value=get("adminEmail");
 render();
 </script>
 </body>
