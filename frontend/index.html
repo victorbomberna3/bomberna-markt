@@ -253,6 +253,9 @@ function addMarket(){
   document.getElementById("m_staff").value="";
   document.getElementById("m_note").value="";
   render();
+  var btn=document.querySelector("button.act[onclick='addMarket()']");
+  btn.textContent="Opgeslagen"; btn.disabled=true;
+  setTimeout(function(){ btn.textContent="Marktdag opslaan"; btn.disabled=false; },1500);
 }
 function del(id){
   if(!confirm("Deze marktdag verwijderen?")) return;
