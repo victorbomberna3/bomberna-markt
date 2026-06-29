@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#2f5233" />
+<title>Bomberna Markt</title>
+<style>
+  :root{
+    --green:#2f5233; --green-d:#244026; --green-l:#e7efe6;
+    --cream:#f7f4ec; --ink:#23271f; --muted:#6b7464;
+    --line:#d9d6cb; --white:#fff; --amber:#b5651d; --red:#9c3b34;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    background:var(--cream); color:var(--ink); font-size:17px; line-height:1.4;
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  header{
+    background:var(--green); color:var(--cream);
+    padding:calc(env(safe-area-inset-top) + 14px) 18px 14px;
+    display:flex; align-items:baseline; gap:8px;
+  }
+  header h1{font-size:19px;margin:0;font-weight:600;letter-spacing:.2px}
+  header span{font-size:13px;opacity:.75}
+  .warn{background:#fff4e0;color:#7a4b12;font-size:13px;padding:8px 18px;border-bottom:1px solid #f0dcb8;display:none}
+  .tabs{display:flex;background:var(--green-d);position:sticky;top:0;z-index:5}
+  .tabs button{
+    flex:1;background:none;border:none;color:#cdd8c8;font-size:16px;font-weight:600;
+    padding:14px 0;cursor:pointer;border-bottom:3px solid transparent;
+  }
+  .tabs button.on{color:#fff;border-bottom-color:#a9c47f}
+  main{padding:18px 16px 90px;max-width:560px;margin:0 auto}
+  .card{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:16px}
+  label{display:block;font-size:13px;color:var(--muted);font-weight:600;margin:0 0 5px}
+  label .req{color:var(--red)}
+  input,textarea,select{
+    width:100%;font-size:17px;padding:12px;border:1px solid var(--line);
+    border-radius:10px;background:#fff;color:var(--ink);font-family:inherit;
+  }
+  input:focus,textarea:focus{outline:none;border-color:var(--green)}
+  .field{margin-bottom:13px}
+  .row{display:flex;gap:10px}
+  .row .field{flex:1}
+  .hint{font-size:12px;color:var(--muted);margin-top:4px}
+  button.act{
+    width:100%;background:var(--green);color:#fff;border:none;border-radius:11px;
+    padding:15px;font-size:17px;font-weight:600;cursor:pointer;margin-top:4px;
+  }
+  button.act:active{background:var(--green-d)}
+  button.ghost{background:#fff;color:var(--green);border:1.5px solid var(--green)}
+  button.ghost:active{background:var(--green-l)}
+  .stats{display:flex;gap:10px;margin-bottom:16px}
+  .stat{flex:1;background:var(--green-l);border-radius:12px;padding:12px;text-align:center}
+  .stat b{display:block;font-size:21px;color:var(--green-d)}
+  .stat small{font-size:12px;color:var(--muted)}
+  .entry{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+  .entry:last-child{border-bottom:none}
+  .entry .d{flex:1}
+  .entry .d strong{font-size:16px}
+  .entry .d small{display:block;color:var(--muted);font-size:13px}
+  .entry .v{font-weight:700;color:var(--green-d)}
+  .entry .x{background:none;border:none;color:var(--muted);font-size:20px;padding:4px 8px;cursor:pointer}
+  .bars{display:flex;align-items:flex-end;gap:5px;height:90px;margin:6px 0 2px}
+  .bars .b{flex:1;background:var(--green);border-radius:4px 4px 0 0;min-height:3px;position:relative}
+  .bars .b.sat{background:var(--amber)}
+  .barlbl{display:flex;gap:5px;font-size:10px;color:var(--muted)}
+  .barlbl span{flex:1;text-align:center;overflow:hidden;white-space:nowrap}
+  .empty{color:var(--muted);text-align:center;padding:18px 0;font-size:15px}
+  h2{font-size:15px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin:0 0 10px}
+  .legend{font-size:12px;color:var(--muted);display:flex;gap:14px;margin-top:6px}
+  .dot{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:4px;vertical-align:middle}
+  .small-actions{display:flex;gap:10px;margin-top:6px}
+  .small-actions button{flex:1;font-size:14px;padding:11px}
+  details summary{font-size:14px;color:var(--muted);cursor:pointer;margin-top:4px}
+</style>
+</head>
+<body>
+<header><h1>Bomberna Markt</h1><span id="hdrsub">overzicht en facturen</span></header>
+<div class="warn" id="warn">Let op: opslag werkt niet in deze weergave. Gegevens blijven enkel tot je de pagina sluit. Eenmaal online (Netlify) of opgeslagen op je telefoon blijft alles bewaard.</div>
+
+<div class="tabs">
+  <button id="tabMarkt" class="on" onclick="show('markt')">Markt</button>
+  <button id="tabFactuur" onclick="show('factuur')">Factuur</button>
+</div>
+
+<main>
+  <!-- ================= MARKT ================= -->
+  <section id="markt">
+    <div class="card">
+      <h2>Nieuwe marktdag</h2>
+      <div class="row">
+        <div class="field">
+          <label>Datum <span class="req">*</span></label>
+          <input type="date" id="m_date" />
+          <div class="hint" id="m_day"></div>
+        </div>
+        <div class="field">
+          <label>Medewerkers</label>
+          <input type="number" id="m_staff" inputmode="numeric" min="0" placeholder="bv. 3" />
+        </div>
+      </div>
+      <div class="field">
+        <label>Omzet (EUR) <span class="req">*</span></label>
+        <input type="number" id="m_rev" inputmode="decimal" min="0" step="0.01" placeholder="bv. 1850" />
+      </div>
+      <div class="field">
+        <label>Notitie</label>
+        <input type="text" id="m_note" placeholder="bv. regen, Pasen, drukke dag" />
+      </div>
+      <button class="act" onclick="addMarket()">Marktdag opslaan</button>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><b id="s_count">0</b><small>marktdagen</small></div>
+      <div class="stat"><b id="s_total">EUR 0</b><small>totale omzet</small></div>
+      <div class="stat"><b id="s_avg">EUR 0</b><small>gemiddeld</small></div>
+    </div>
+
+    <div class="card">
+      <h2>Omzet per marktdag</h2>
+      <div class="bars" id="bars"></div>
+      <div class="barlbl" id="barlbl"></div>
+      <div class="legend">
+        <span><span class="dot" style="background:#2f5233"></span>weekdag</span>
+        <span><span class="dot" style="background:#b5651d"></span>zaterdag</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Alle marktdagen</h2>
+      <div id="list"><div class="empty">Nog geen marktdagen ingevoerd.</div></div>
+      <div class="small-actions">
+        <button class="ghost" onclick="exportCsv()">Exporteer CSV</button>
+        <button class="ghost" onclick="emailSummary()">Mail overzicht</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FACTUUR ================= -->
+  <section id="factuur" style="display:none">
+    <div class="card">
+      <h2>Factuuraanvraag</h2>
+      <div class="field">
+        <label>Bedrijfsnaam <span class="req">*</span></label>
+        <input type="text" id="f_company" placeholder="bv. Bloemen Janssens BV" />
+      </div>
+      <div class="field">
+        <label>Contactpersoon</label>
+        <input type="text" id="f_contact" placeholder="naam koper (optioneel)" />
+      </div>
+      <div class="field">
+        <label>Ondernemingsnummer <span class="req">*</span></label>
+        <input type="text" id="f_vat" placeholder="BE 0123.456.789" />
+        <div class="hint">Belgisch formaat: BE 0XXX.XXX.XXX</div>
+      </div>
+      <div class="field">
+        <label>Adres <span class="req">*</span></label>
+        <input type="text" id="f_addr" placeholder="straat, nr, postcode, gemeente" />
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>Telefoon</label>
+          <input type="tel" id="f_phone" inputmode="tel" placeholder="04xx xx xx xx" />
+        </div>
+        <div class="field">
+          <label>E-mail</label>
+          <input type="email" id="f_email" inputmode="email" placeholder="voor de factuur" />
+        </div>
+      </div>
+      <div class="field">
+        <label>Omschrijving bestelling <span class="req">*</span></label>
+        <input type="text" id="f_desc" placeholder="bv. 3 boeketten, 1 plant" />
+      </div>
+      <div class="field">
+        <label>Bedrag incl. btw (EUR) <span class="req">*</span></label>
+        <input type="number" id="f_amount" inputmode="decimal" min="0" step="0.01" placeholder="bv. 145.00" />
+      </div>
+      <div class="field">
+        <label>Opmerking</label>
+        <input type="text" id="f_remark" placeholder="optioneel" />
+      </div>
+      <button class="act" onclick="sendInvoice()">Open e-mail naar administratie</button>
+      <div class="small-actions">
+        <button class="ghost" onclick="copyInvoice()">Kopieer gegevens</button>
+        <button class="ghost" onclick="clearInvoice()">Wissen</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <details>
+        <summary>Instellingen</summary>
+        <div class="field" style="margin-top:12px">
+          <label>E-mailadres administratie</label>
+          <input type="email" id="adminEmail" inputmode="email" placeholder="administratie@bomberna.be" onchange="saveAdmin()" />
+          <div class="hint">Eenmalig instellen. Hierheen gaan de factuuraanvragen.</div>
+        </div>
+      </details>
+    </div>
+  </section>
+</main>
+
+<script>
+/* ---------- storage with safe fallback ---------- */
+var mem={}, storageOk=true;
+try{ localStorage.setItem("__t","1"); localStorage.removeItem("__t"); }catch(e){ storageOk=false; }
+if(!storageOk){ document.getElementById("warn").style.display="block"; }
+function get(k){ try{ return storageOk? localStorage.getItem(k): mem[k]; }catch(e){ return mem[k]; } }
+function set(k,v){ try{ if(storageOk) localStorage.setItem(k,v); else mem[k]=v; }catch(e){ mem[k]=v; } }
+
+var DAYS=["zondag","maandag","dinsdag","woensdag","donderdag","vrijdag","zaterdag"];
+function parseLocalDate(s){ var p=s.split("-"); return new Date(+p[0],+p[1]-1,+p[2]); }
+function load(){ try{ return JSON.parse(get("markets")||"[]"); }catch(e){ return []; } }
+function save(a){ set("markets", JSON.stringify(a)); }
+function eur(n){ return "EUR "+Number(n||0).toLocaleString("nl-BE",{minimumFractionDigits:0,maximumFractionDigits:0}); }
+
+/* ---------- tabs ---------- */
+function show(t){
+  document.getElementById("markt").style.display = t==="markt"?"block":"none";
+  document.getElementById("factuur").style.display = t==="factuur"?"block":"none";
+  document.getElementById("tabMarkt").className = t==="markt"?"on":"";
+  document.getElementById("tabFactuur").className = t==="factuur"?"on":"";
+  document.getElementById("hdrsub").textContent = t==="markt"?"overzicht en omzet":"factuuraanvraag";
+}
+
+/* ---------- markt ---------- */
+function setDateDefault(){
+  var d=new Date(), p=function(n){return(n<10?"0":"")+n;};
+  document.getElementById("m_date").value=d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate());
+  updateDay();
+}
+function updateDay(){
+  var v=document.getElementById("m_date").value;
+  document.getElementById("m_day").textContent = v? DAYS[parseLocalDate(v).getDay()] : "";
+}
+document.getElementById("m_date").addEventListener("change",updateDay);
+
+function addMarket(){
+  var date=document.getElementById("m_date").value;
+  var rev=parseFloat(document.getElementById("m_rev").value);
+  if(!date){ alert("Vul een datum in."); return; }
+  if(isNaN(rev)){ alert("Vul de omzet in."); return; }
+  var a=load();
+  a.push({
+    id:Date.now(), date:date, rev:rev,
+    staff:parseInt(document.getElementById("m_staff").value)||null,
+    note:document.getElementById("m_note").value.trim()
+  });
+  save(a);
+  document.getElementById("m_rev").value="";
+  document.getElementById("m_staff").value="";
+  document.getElementById("m_note").value="";
+  render();
+}
+function del(id){
+  if(!confirm("Deze marktdag verwijderen?")) return;
+  save(load().filter(function(x){return x.id!==id;}));
+  render();
+}
+function render(){
+  var a=load().slice().sort(function(x,y){return x.date<y.date?1:-1;});
+  // stats
+  var total=a.reduce(function(s,x){return s+x.rev;},0);
+  document.getElementById("s_count").textContent=a.length;
+  document.getElementById("s_total").textContent=eur(total);
+  document.getElementById("s_avg").textContent=eur(a.length?total/a.length:0);
+  // list
+  var L=document.getElementById("list");
+  if(!a.length){ L.innerHTML='<div class="empty">Nog geen marktdagen ingevoerd.</div>'; }
+  else{
+    L.innerHTML=a.map(function(x){
+      var day=DAYS[parseLocalDate(x.date).getDay()];
+      var sub=day+(x.staff?(" \u00b7 "+x.staff+" pers."):"")+(x.note?(" \u00b7 "+x.note):"");
+      return '<div class="entry"><div class="d"><strong>'+fmtDate(x.date)+'</strong><small>'+sub+'</small></div>'
+        +'<div class="v">'+eur(x.rev)+'</div>'
+        +'<button class="x" onclick="del('+x.id+')">\u00d7</button></div>';
+    }).join("");
+  }
+  // chart: oldest->newest, last 12
+  var chron=a.slice().reverse().slice(-12);
+  var max=Math.max.apply(null,chron.map(function(x){return x.rev;}).concat([1]));
+  document.getElementById("bars").innerHTML=chron.map(function(x){
+    var h=Math.round((x.rev/max)*100);
+    var sat=parseLocalDate(x.date).getDay()===6?" sat":"";
+    return '<div class="b'+sat+'" style="height:'+h+'%" title="'+eur(x.rev)+'"></div>';
+  }).join("")||"";
+  document.getElementById("barlbl").innerHTML=chron.map(function(x){
+    return '<span>'+x.date.slice(8,10)+"/"+x.date.slice(5,7)+'</span>';
+  }).join("");
+}
+function fmtDate(s){ return s.slice(8,10)+"/"+s.slice(5,7)+"/"+s.slice(0,4); }
+
+function exportCsv(){
+  var a=load().slice().sort(function(x,y){return x.date<y.date?-1:1;});
+  if(!a.length){ alert("Geen gegevens om te exporteren."); return; }
+  var rows=[["datum","dag","omzet","medewerkers","notitie"]].concat(
+    a.map(function(x){return [x.date,DAYS[parseLocalDate(x.date).getDay()],x.rev,x.staff||"",'"'+(x.note||"")+'"'];})
+  );
+  var csv=rows.map(function(r){return r.join(";");}).join("\n");
+  var blob=new Blob([csv],{type:"text/csv"});
+  var url=URL.createObjectURL(blob), link=document.createElement("a");
+  link.href=url; link.download="markt-omzet.csv"; link.click();
+  URL.revokeObjectURL(url);
+}
+function emailSummary(){
+  var a=load().slice().sort(function(x,y){return x.date<y.date?-1:1;});
+  if(!a.length){ alert("Geen gegevens om te mailen."); return; }
+  var total=a.reduce(function(s,x){return s+x.rev;},0);
+  var body="Overzicht marktdagen\n\n"+a.map(function(x){
+    return fmtDate(x.date)+" ("+DAYS[parseLocalDate(x.date).getDay()]+"): "+eur(x.rev)+(x.staff?(", "+x.staff+" pers."):"");
+  }).join("\n")+"\n\nTotaal: "+eur(total)+" over "+a.length+" marktdagen.";
+  var to=get("adminEmail")||"";
+  location.href="mailto:"+encodeURIComponent(to)+"?subject="+encodeURIComponent("Overzicht marktdagen")+"&body="+encodeURIComponent(body);
+}
+
+/* ---------- factuur ---------- */
+function buildInvoiceText(){
+  var g=function(id){return document.getElementById(id).value.trim();};
+  return "Nieuwe factuuraanvraag van de markt.\n\n"
+    +"Bedrijfsnaam: "+g("f_company")+"\n"
+    +"Contactpersoon: "+(g("f_contact")||"-")+"\n"
+    +"Ondernemingsnummer: "+g("f_vat")+"\n"
+    +"Adres: "+g("f_addr")+"\n"
+    +"Telefoon: "+(g("f_phone")||"-")+"\n"
+    +"E-mail: "+(g("f_email")||"-")+"\n\n"
+    +"Bestelling: "+g("f_desc")+"\n"
+    +"Bedrag incl. btw: EUR "+g("f_amount")+"\n"
+    +"Opmerking: "+(g("f_remark")||"-")+"\n";
+}
+function validInvoice(){
+  var req=[["f_company","bedrijfsnaam"],["f_vat","ondernemingsnummer"],["f_addr","adres"],["f_desc","omschrijving"],["f_amount","bedrag"]];
+  for(var i=0;i<req.length;i++){
+    if(!document.getElementById(req[i][0]).value.trim()){ alert("Vul in: "+req[i][1]); return false; }
+  }
+  return true;
+}
+function sendInvoice(){
+  if(!validInvoice()) return;
+  var to=get("adminEmail")||"";
+  var subj="Factuuraanvraag - "+document.getElementById("f_company").value.trim();
+  location.href="mailto:"+encodeURIComponent(to)+"?subject="+encodeURIComponent(subj)+"&body="+encodeURIComponent(buildInvoiceText());
+}
+function copyInvoice(){
+  if(!validInvoice()) return;
+  var t=buildInvoiceText();
+  if(navigator.clipboard){ navigator.clipboard.writeText(t).then(function(){alert("Gegevens gekopieerd.");}); }
+  else{ alert(t); }
+}
+function clearInvoice(){
+  ["f_company","f_contact","f_vat","f_addr","f_phone","f_email","f_desc","f_amount","f_remark"].forEach(function(id){
+    document.getElementById(id).value="";
+  });
+}
+function saveAdmin(){ set("adminEmail", document.getElementById("adminEmail").value.trim()); }
+
+/* ---------- init ---------- */
+setDateDefault();
+document.getElementById("adminEmail").value=get("adminEmail")||"";
+render();
+</script>
+</body>
+</html>
