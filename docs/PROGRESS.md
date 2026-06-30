@@ -19,6 +19,9 @@
 4. Resolve invoice end-state (Q2) and accounting integration (Q3) before building anything
    invoice-related beyond the current email flow.
 
+### Cleanup
+- Dead `.row` and `.row .field` CSS rules to remove on next CSS pass (columns removed, rules left in place).
+
 ### Later
 - Durable season storage (Google Sheet via Apps Script, or the Path B database).
 - Optional product shortlist for faster invoice entry.
