@@ -14,7 +14,7 @@
     --line:#d9d6cb; --white:#fff; --amber:#b5651d; --red:#9c3b34;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  html,body{margin:0;padding:0}
+  html,body{margin:0;padding:0;overflow-x:hidden;max-width:100%}
   body{
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
     background:var(--cream); color:var(--ink); font-size:17px; line-height:1.4;
@@ -23,7 +23,7 @@
   header{
     background:var(--green); color:var(--cream);
     padding:calc(env(safe-area-inset-top) + 14px) 18px 14px;
-    display:flex; align-items:baseline; gap:8px;
+    display:flex; flex-direction:column; align-items:flex-start; gap:2px;
   }
   header h1{font-size:19px;margin:0;font-weight:600;letter-spacing:.2px}
   header span{font-size:13px;opacity:.75}
@@ -34,7 +34,7 @@
     padding:14px 0;cursor:pointer;border-bottom:3px solid transparent;
   }
   .tabs button.on{color:#fff;border-bottom-color:#a9c47f}
-  main{padding:18px 16px 90px;max-width:560px;margin:0 auto}
+  main{padding:18px 16px 90px;width:100%;max-width:560px;margin:0 auto}
   .card{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:16px}
   label{display:block;font-size:13px;color:var(--muted);font-weight:600;margin:0 0 5px}
   label .req{color:var(--red)}
@@ -80,7 +80,7 @@
 </style>
 </head>
 <body>
-<header><h1>BOMBERNA TEST 123</h1><span id="hdrsub">overzicht en facturen</span></header>
+<header><h1>Bloemenmarkt Bomberna</h1><span id="hdrsub">Knokke-Heist &middot; overzicht en omzet</span></header>
 <div class="warn" id="warn">Let op: opslag werkt niet in deze weergave. Gegevens blijven enkel tot je de pagina sluit. Eenmaal online (Netlify) of opgeslagen op je telefoon blijft alles bewaard.</div>
 
 <div class="tabs">
@@ -220,7 +220,7 @@ function show(t){
   document.getElementById("factuur").style.display = t==="factuur"?"block":"none";
   document.getElementById("tabMarkt").className = t==="markt"?"on":"";
   document.getElementById("tabFactuur").className = t==="factuur"?"on":"";
-  document.getElementById("hdrsub").textContent = t==="markt"?"overzicht en omzet":"factuuraanvraag";
+  document.getElementById("hdrsub").textContent = t==="markt"?"Knokke-Heist · overzicht en omzet":"Knokke-Heist · factuuraanvraag";
 }
 
 /* ---------- markt ---------- */
